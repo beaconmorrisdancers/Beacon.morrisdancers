@@ -89,11 +89,39 @@
             .calendar-actions .btn {
                 min-width: 180px;
             }
-            .calendar-iframe {
-                width: 100%;
-                min-height: 420px;
-                border: 1px solid #d8e3d1;
-                border-radius: 0.5rem;
+            .events-list {
+                display: grid;
+                gap: 0.75rem;
+                text-align: left;
+            }
+            .event-item {
+                padding: 0.85rem 1rem;
+                border: 1px solid #e3ebdc;
+                border-radius: 0.7rem;
+                background-color: #f9fcf7;
+            }
+            .event-date {
+                font-weight: 700;
+                color: #2f6b35;
+            }
+            .event-title {
+                font-size: 1.05rem;
+                font-weight: 600;
+                margin-bottom: 0.2rem;
+            }
+            .event-meta {
+                color: #5b6b55;
+                font-size: 0.95rem;
+            }
+            .event-status {
+                display: inline-block;
+                margin-top: 0.35rem;
+                padding: 0.2rem 0.55rem;
+                border-radius: 999px;
+                background-color: #e8f4e7;
+                color: #3b6d40;
+                font-size: 0.8rem;
+                font-weight: 600;
             }
         </style>
         
@@ -126,17 +154,14 @@
             <div class="row Normal-white-box-row">
                 <div class="col">
                     <div class="p-4 border calendar-card">
-                        <div class="calendar-badge">Events</div>
-                        <h2 class="h4 mb-2">Upcoming events</h2>
-                        <p class="text-muted mb-3">See what is coming up and keep the calendar on your own device.</p>
-                        <div class="calendar-actions">
-                            <a href="https://morrisbook.co.uk/ical/events?token=Z92gdZLDcBT207TloIVW9LRHYBrEJfQl" target="_blank" rel="noopener noreferrer" class="btn btn-success btn-lg">Open full calendar</a>
-                            <a href="https://morrisbook.co.uk/ical/events?token=Z92gdZLDcBT207TloIVW9LRHYBrEJfQl" class="btn btn-outline-success btn-lg">Subscribe with iCal</a>
+                        <div class="calendar-badge">On the calendar</div>
+                        <h2 class="h4 mb-2">Upcoming performances</h2>
+                        <p class="text-muted mb-3">Here are the events we are currently booked to dance at.</p>
+                        <div id="events-loading" class="text-muted">Loading events…</div>
+                        <div id="events-list" class="events-list d-none"></div>
+                        <div class="calendar-actions mt-3">
+                            <a href="https://morrisbook.co.uk/ical/events?token=Z92gdZLDcBT207TloIVW9LRHYBrEJfQl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success">Open full calendar</a>
                         </div>
-                        <p class="small text-muted mt-3 mb-0">This uses the calendar feed you provided, so it can be added to most calendar apps.</p>
-                        <!-- If your calendar site supports embedding, replace the buttons above with an iframe like this:
-                        <iframe src="https://morrisbook.co.uk/ical/events?token=Z92gdZLDcBT207TloIVW9LRHYBrEJfQl" title="Calendar" class="calendar-iframe"></iframe>
-                        -->
                     </div>
                 </div>
             </div>
@@ -152,5 +177,92 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        <script>
+            const apiUrl = 'https://morrisbook.co.uk/api/v1/events?token=ktA6GAXzMbYWhT6sNPlupYBnj8wfLoYW';
+
+            function escapeHtml(value) {
+                return String(value ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const [year, month, day] = dateString.split('-').map(Number);
+                const date = new Date(Date.UTC(year, month - 1, day));
+                return new Intl.DateTimeFormat('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                }).format(date);
+            }
+
+            function formatTime(timeString) {
+                if (!timeString) return '';
+                const [hours, minutes] = timeString.split(':').map(Number);
+                const date = new Date();
+                date.setHours(hours, minutes, 0, 0);
+                return new Intl.DateTimeFormat('en-GB', {
+                    hour: 'numeric',
+                    minute: '2-digit'
+                }).format(date);
+            }
+
+            function getStatusLabel(status) {
+                if (status === 1) return 'Confirmed';
+                if (status === 3) return 'Tentative';
+                return 'Scheduled';
+            }
+
+            async function loadEvents() {
+                const loadingEl = document.getElementById('events-loading');
+                const listEl = document.getElementById('events-list');
+
+                try {
+                    const response = await fetch(apiUrl, { mode: 'cors' });
+                    if (!response.ok) {
+                        throw new Error('Unable to load events');
+                    }
+
+                    const events = await response.json();
+                    const upcoming = events
+                        .filter((event) => event.start_date)
+                        .sort((a, b) => a.start_date.localeCompare(b.start_date));
+
+                    if (!upcoming.length) {
+                        loadingEl.innerHTML = 'No upcoming events are available right now.';
+                        return;
+                    }
+
+                    listEl.innerHTML = upcoming.slice(0, 8).map((event) => {
+                        const dateLabel = formatDate(event.start_date);
+                        const timeLabel = formatTime(event.start_time);
+                        const locationLabel = event.location ? `<div class="event-meta">${escapeHtml(event.location)}</div>` : '';
+                        const timeDisplay = timeLabel ? `<div class="event-meta">${escapeHtml(timeLabel)}</div>` : '';
+                        const statusLabel = `<div class="event-status">${escapeHtml(getStatusLabel(event.status))}</div>`;
+
+                        return `
+                            <div class="event-item">
+                                <div class="event-date">${escapeHtml(dateLabel)}</div>
+                                <div class="event-title">${escapeHtml(event.name)}</div>
+                                ${timeDisplay}
+                                ${locationLabel}
+                                ${statusLabel}
+                            </div>
+                        `;
+                    }).join('');
+
+                    loadingEl.classList.add('d-none');
+                    listEl.classList.remove('d-none');
+                } catch (error) {
+                    loadingEl.innerHTML = 'We could not load the calendar right now. Please try again later or open the full calendar link above.';
+                }
+            }
+
+            loadEvents();
+        </script>
     </body>
 </html>
