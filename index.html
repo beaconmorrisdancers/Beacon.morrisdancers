@@ -24,28 +24,51 @@
                 border-radius: 12px;
                 margin-top: 20px;
             }
-            .my-custom-row {
+            .Big-text-row {
                 
-                height: 800px;
+                padding: 5px;
+                margin-bottom: 0px;
+                text-align: center;
+            }
+            .Huge-text-row {
+                background-color: #7A8F56;
+                color: #ffffff;
+                padding: 5px;
+                margin-bottom: 0px;
+                text-align: center;
+            }
+            .Normal-white-box-row {
+                background-color: #ffffff;
                 padding: 20px;
                 margin-bottom: 15px;
+                text-align: center;
             }
         </style>
         
         <div class="container">
             <div class="row">
                 <div class="col">Col1</div>
-                <div class="col"><img src="images/Beacon Logo Shadow.png" alt="Beacon Logo" class="img-fluid"></div>
+                <div class="col"><img src="images/Beacon Logo v2.jpg" alt="Beacon Logo" class="rounded-circle shadow-lg" style="border: 10px solid #ffffff;"></div>
                 <div class="col">Col3</div>
             </div>
-            <div class="row my-custom-row">
-                <div class="col"><div class="p-3 border bg-light">Col One</div></div>
-                <div class="col"><div class="p-3 border bg-light">Welcome to Beacon Morris</div></div>
-                <div class="col"><div class="p-3 border bg-light">Col Three</div></div>
+            <div class="row Big-text-row">
+                
+                <div class="col"><h1 class="display-3">Welcome to</h1></div>
+        
             </div>
-            <div class="row my-custom-row">
-                <div class="col"><div class="p-3 border bg-light">Col One</div></div>
-                <div class="col"><div class="p-3 border bg-light">Col Two</div></div>
+             <div class="row Huge-text-row">
+                
+                <div class="col"><h1 class="display-1">Beacon Morris</h1></div>
+        
+            </div>
+            <div class="row Big-text-row">
+                
+                <div class="col"><h1 class="display-3">of West Malvern!</h1></div>
+        
+            </div>
+            <div class="row Normal-white-box-row">
+                <div class="col"><div class="p-3 border">Col One</div></div>
+                <div class="col"><div class="p-3 border">Col Two</div></div>
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
