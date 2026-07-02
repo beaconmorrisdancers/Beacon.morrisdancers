@@ -23,6 +23,14 @@
                 box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
                 border-radius: 12px;
                 margin-top: 20px;
+                margin-bottom: 20px;
+            }
+            .containerblack {
+                padding: 20px;
+                background-color: rgba(0, 0, 0, 0.9);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+                border-radius: 12px;
+                margin-top: 20px;
             }
             .Big-text-row {
                 
@@ -45,6 +53,12 @@
             }
             .Medium-text-row {
                 color: #05530f;
+                padding: 0px;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+            .Paragraph-text-row {
+                color: #011f05;
                 padding: 0px;
                 margin-bottom: 20px;
                 text-align: center;
@@ -135,9 +149,9 @@
         
         <div class="container">
             <div class="row">
-                <!--<div class="col">Col1</div>-->
+                <div class="col"></div>
                 <div class="col" style="display: flex; justify-content: center; align-items: center;"><img src="images/Beacon Logo v2.jpg" alt="Beacon Logo" class="rounded-circle shadow-lg" style="max-width: 100%; height: auto;"></div>
-                <!--<div class="col">Col3</div>-->
+                <div class="col"></div>
             </div>
             <div class="row Big-text-row">
                 
@@ -160,15 +174,20 @@
         
             </div>
             <div class="row Normal-white-box-row">
-                <div class="col">
-                    <div class="p-4 border calendar-card">
-                        <div class="calendar-badge">Come see us dance!</div>
-                        <p class="text-muted mb-3">Below are some events we are hoping to dance at.</p>
-                        <div id="events-loading" class="text-muted">Loading events…</div>
-                        <div id="events-list" class="events-list d-none"></div>
-                        <div class="calendar-actions mt-3">
-                            <button id="toggle-past-btn" class="btn btn-outline-secondary">Show all events (including past)</button>
-                            <a href="https://morrisbook.co.uk/ical/events?token=Z92gdZLDcBT207TloIVW9LRHYBrEJfQl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success">Open full calendar</a>
+                <div class="col text-center">
+                    <button class="btn btn-success mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#calendarCollapse" aria-expanded="false" aria-controls="calendarCollapse">
+                        Click to see where we're dancing
+                    </button>
+                    <div class="collapse" id="calendarCollapse">
+                        <div class="p-4 border calendar-card">
+                            <div class="calendar-badge">Come see us dance!</div>
+                            <p class="text-muted mb-3">Below are some events we are hoping to dance at.</p>
+                            <div id="events-loading" class="text-muted">Loading events…</div>
+                            <div id="events-list" class="events-list d-none"></div>
+                            <div class="calendar-actions mt-3">
+                                <button id="toggle-past-btn" class="btn btn-outline-secondary">Show all events (including past)</button>
+                                <a href="https://morrisbook.co.uk/ical/events?token=Z92gdZLDcBT207TloIVW9LRHYBrEJfQl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success">Open full calendar</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -185,6 +204,31 @@
                 <div class="col"><img src="images/Beacon Photo 3.jpg" alt="Photo of Beacon Morris" class="rounded-square shadow-lg" style="max-width: 100%; height: auto;"></div>
             </div>
         </div>
+
+        <div class="container">
+       
+             <div class="row Huge-text-row">
+                
+                <div class="col"><h3 class="display-6"><b>Hello! We are Beacon. West Malvern's Morris Side.</b></h3></div>
+        
+            </div>
+            <div class="row Paragraph-text-row">
+                
+                <div class="col">
+                    <p>In the Autumn/Winter, we practice on most Tuesdays 7:15 to 9:15pm in the West Malvern Village Hall. <br/> 👉 <a href="https://maps.app.goo.gl/EWJVjhVgH3pMWM7s8" target="_blank">Map Link </a></p><p> followed by tea nearby!</a> </p>
+                    <p>In the Spring/Summer, we dance about at a variety of pubs, festivals and on the hills.</p>
+                    <p>We'd be very happy if you wanted to come along to learn more about dancing or playing music for morris...</p>
+                    <p>If you're interested, please contact:</p>
+                    <p>Mike Salter | <a href="mailto:mike@castlesalter.co.uk">mike@castlesalter.co.uk</a> | 01684 565211</p>
+                    <p>We're not great at keeping things up to date... but we have a bunch of photos and bits on our Facebook page:</p>
+                    <p>Please have a look at: <a href="https://www.facebook.com/BeaconMorrisDancers" target="_blank">www.facebook.com/BeaconMorrisDancers</a></p>
+</div>
+        
+            </div>
+
+            </div>
+
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
         <script>
             const apiUrl = 'https://morrisbook.co.uk/api/v1/events?token=ktA6GAXzMbYWhT6sNPlupYBnj8wfLoYW';
