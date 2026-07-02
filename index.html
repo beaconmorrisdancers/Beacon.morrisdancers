@@ -55,12 +55,20 @@
                 aspect-ratio: 16 / 9;
                 overflow: hidden;
                 background-color: #f2f2f2;
-                border-radius: 0.25rem;
+                border-radius: 0.5rem;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
             }
             .video-square iframe {
                 width: 100%;
                 height: 100%;
                 border: 0;
+            }
+            .rounded-square {
+                display: block;
+                width: 100%;
+                height: auto;
+                border-radius: 0.5rem;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
             }
             .calendar-card {
                 background-color: #ffffff;
@@ -154,26 +162,27 @@
             <div class="row Normal-white-box-row">
                 <div class="col">
                     <div class="p-4 border calendar-card">
-                        <div class="calendar-badge">On the calendar</div>
-                        <h2 class="h4 mb-2">Upcoming performances</h2>
-                        <p class="text-muted mb-3">Here are the events we are currently booked to dance at.</p>
+                        <div class="calendar-badge">Come see us dance!</div>
+                        <p class="text-muted mb-3">Below are some events we are hoping to dance at.</p>
                         <div id="events-loading" class="text-muted">Loading events…</div>
                         <div id="events-list" class="events-list d-none"></div>
                         <div class="calendar-actions mt-3">
+                            <button id="toggle-past-btn" class="btn btn-outline-secondary">Show all events (including past)</button>
                             <a href="https://morrisbook.co.uk/ical/events?token=Z92gdZLDcBT207TloIVW9LRHYBrEJfQl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success">Open full calendar</a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row Normal-white-box-row">
-                <div class="col"><div class="p-1 border"><img src="images/Beacon Photo 2.jpg" alt="Photo of Beacon Morris" class="rounded-square shadow-lg" style="max-width: 100%; height: auto;"></div></div>
-                <div class="col"><div class="p-1 border"><div class="video-square">
+                <div class="col"><img src="images/Beacon Photo 2.jpg" alt="Photo of Beacon Morris" class="rounded-square shadow-lg" style="max-width: 100%; height: auto;"></div>
+
+                <div class="col"><div class="video-square">
   <iframe src="https://www.youtube.com/embed/AdyG0vthXw8?rel=0" title="Beacon Morris video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-</div></div></div>
+</div></div>
             </div>
             <div class="row Normal-white-box-row">
-                <div class="col"><div class="p-1 border"><img src="images/Beacon Photo 1.jpg" alt="Photo of Beacon Morris" class="rounded-square shadow-lg" style="max-width: 100%; height: auto;"></div></div>
-                <div class="col"><div class="p-1 border"><img src="images/Beacon Photo 3.jpg" alt="Photo of Beacon Morris" class="rounded-square shadow-lg" style="max-width: 100%; height: auto;"></div></div>
+                <div class="col"><img src="images/Beacon Photo 1.jpg" alt="Photo of Beacon Morris" class="rounded-square shadow-lg" style="max-width: 100%; height: auto;"></div>
+                <div class="col"><img src="images/Beacon Photo 3.jpg" alt="Photo of Beacon Morris" class="rounded-square shadow-lg" style="max-width: 100%; height: auto;"></div>
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
@@ -213,13 +222,21 @@
 
             function getStatusLabel(status) {
                 if (status === 1) return 'Confirmed';
-                if (status === 3) return 'Tentative';
+                if (status === 3) return '*Tentative*';
                 return 'Scheduled';
+            }
+
+            // Whether to show all events (including past). Defaults to false: only show today and future events.
+            let showAllEvents = false;
+
+            function pad(num) {
+                return String(num).padStart(2, '0');
             }
 
             async function loadEvents() {
                 const loadingEl = document.getElementById('events-loading');
                 const listEl = document.getElementById('events-list');
+                const toggleBtn = document.getElementById('toggle-past-btn');
 
                 try {
                     const response = await fetch(apiUrl, { mode: 'cors' });
@@ -228,16 +245,32 @@
                     }
 
                     const events = await response.json();
-                    const upcoming = events
+                    const allWithDate = events
                         .filter((event) => event.start_date)
                         .sort((a, b) => a.start_date.localeCompare(b.start_date));
 
-                    if (!upcoming.length) {
-                        loadingEl.innerHTML = 'No upcoming events are available right now.';
+                    // Build today's date in YYYY-MM-DD (local)
+                    const now = new Date();
+                    const todayStr = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+
+                    const upcoming = allWithDate.filter((event) => event.start_date >= todayStr);
+
+                    const visible = showAllEvents ? allWithDate : upcoming;
+
+                    if (!visible.length) {
+                        if (showAllEvents) {
+                            loadingEl.innerHTML = 'No events are available.';
+                        } else {
+                            loadingEl.innerHTML = 'No upcoming events are available right now.';
+                        }
+                        loadingEl.classList.remove('d-none');
+                        listEl.classList.add('d-none');
                         return;
                     }
 
-                    listEl.innerHTML = upcoming.slice(0, 8).map((event) => {
+                    const itemsToRender = showAllEvents ? visible : visible.slice(0, 8);
+
+                    listEl.innerHTML = itemsToRender.map((event) => {
                         const dateLabel = formatDate(event.start_date);
                         const timeLabel = formatTime(event.start_time);
                         const locationLabel = event.location ? `<div class="event-meta">${escapeHtml(event.location)}</div>` : '';
@@ -257,12 +290,28 @@
 
                     loadingEl.classList.add('d-none');
                     listEl.classList.remove('d-none');
+
+                    // Update toggle button label
+                    if (toggleBtn) {
+                        toggleBtn.textContent = showAllEvents ? 'Show upcoming only' : 'Show all events (including past)';
+                    }
                 } catch (error) {
                     loadingEl.innerHTML = 'We could not load the calendar right now. Please try again later or open the full calendar link above.';
                 }
             }
 
-            loadEvents();
+            // Wire up the toggle button
+            document.addEventListener('DOMContentLoaded', () => {
+                const toggleBtn = document.getElementById('toggle-past-btn');
+                if (toggleBtn) {
+                    toggleBtn.addEventListener('click', () => {
+                        showAllEvents = !showAllEvents;
+                        loadEvents();
+                    });
+                }
+                // Initial load
+                loadEvents();
+            });
         </script>
     </body>
 </html>
